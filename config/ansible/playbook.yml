@@ -11,7 +11,7 @@
         apache2_log_dir: "/var/log/apache2"
         apache2_web_group: "apache"
         apache2_web_owner: "apache"
-        apache2_web_root: "/var/www"
+        apache2_web_root: "/var/www/localhost/htdocs/"
       when: ansible_os_family == "Alpine"
 
     - name: setting PHP version
