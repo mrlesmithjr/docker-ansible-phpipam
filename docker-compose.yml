@@ -14,9 +14,7 @@ services:
   web:
     depends_on:
       - db
-    build: "./"
-    image: "phpipam"
-    # image: "mrlesmithjr/phpipam:latest"
+    image: "mrlesmithjr/phpipam:latest"
     links:
       - "db"
     ports:
