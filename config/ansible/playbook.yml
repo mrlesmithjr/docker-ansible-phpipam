@@ -1,0 +1,116 @@
+---
+- hosts: localhost
+  become: true
+  connection: local
+  vars:
+    phpipam_root: '{{ apache2_web_root }}/phpipam'
+  roles:
+  tasks:
+    - name: setting Debian facts
+      set_fact:
+        apache2_log_dir: "/var/log/apache2"
+        apache2_web_group: "www-data"
+        apache2_web_owner: "www-data"
+        apache2_web_root: "/var/www/html"
+      when: ansible_os_family == "Debian"
+
+    - name: setting PHP version
+      set_fact:
+        php_path: 'etc/php5'  #no leading / for template path
+        php_ver: 5
+      when: >
+            ansible_distribution == "Debian" or
+            (ansible_distribution == "Ubuntu" and
+            ansible_distribution_version <= '14.04')
+
+    - name: setting PHP version
+      set_fact:
+        php_path: 'etc/php/7.0'  #no leading / for template path
+        php_ver: 7.0
+      when: >
+            (ansible_distribution == "Ubuntu" and
+            ansible_distribution_version >= '16.04')
+
+    - name: Update Apt-Cache
+      apt:
+        update_cache: yes
+
+    - name: Installing phpIPAM Pre-Reqs
+      apt:
+        name: "{{ item }}"
+        state: "present"
+        install_recommends: no
+      with_items:
+        - 'git'
+        - 'mysql-client'
+        - 'php-pear'
+        - 'php{{ php_ver }}-cli'
+        - 'php{{ php_ver }}-curl'
+        - 'php{{ php_ver }}-gd'
+        - 'php{{ php_ver }}-gmp'
+        - 'php{{ php_ver }}-json'
+        - 'php{{ php_ver }}-ldap'
+        - 'php{{ php_ver }}-mcrypt'
+        - 'php{{ php_ver }}-mysql'
+        - 'php{{ php_ver }}-snmp'
+        - 'php{{ php_ver }}-xml'
+        - 'python-mysqldb'
+
+    - name: Enabling Apache2 mod_rewrite
+      apache2_module:
+        name: "rewrite"
+        state: "present"
+
+    - name: config_apache2 | reconfiguring default website
+      template:
+        src: "/000-default.conf.j2"
+        dest: "/etc/apache2/sites-available/000-default.conf"
+
+    - name: Cloning phpIPAM
+      git:
+        repo: "https://github.com/phpipam/phpipam.git"
+        dest: "{{ phpipam_root }}"
+
+    - name: Ensuring Permissions Are Correctly Set
+      file:
+        path: "{{ phpipam_root }}"
+        group: "{{ apache2_web_group }}"
+        owner: "{{ apache2_web_owner }}"
+        state: "directory"
+        recurse: yes
+
+    - name: Adding Cron Job For discoveryCheck
+      cron:
+        name: "phpipam discoveryCheck"
+        job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/discoveryCheck.php"
+        minute: "*/15"
+        hour: "*"
+        day: "*"
+        month: "*"
+        user: "{{ apache2_web_owner }}"
+        cron_file: "phpipam_discoveryCheck"
+        state: "present"
+
+    - name: Adding Cron Job For pingCheck
+      cron:
+        name: "phpipam pingCheck"
+        job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/pingCheck.php"
+        minute: "*/15"
+        hour: "*"
+        day: "*"
+        month: "*"
+        user: "{{ apache2_web_owner }}"
+        cron_file: "phpipam_pingCheck"
+        state: "present"
+
+    - name: Adding Cron Job For resolveIPaddresses
+      cron:
+        name: "phpipam resolveIPaddresses"
+        job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/resolveIPaddresses.php"
+        minute: "0"
+        hour: "*"
+        day: "*"
+        month: "*"
+        user: "{{ apache2_web_owner }}"
+        cron_file: "phpipam_resolveIPaddresses"
+        state: "present"

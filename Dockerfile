@@ -1,54 +1,21 @@
-FROM debian:jessie
+FROM mrlesmithjr/apache2
 
 MAINTAINER Larry Smith Jr. <mrlesmithjr@gmail.com>
 
-# Update apt-cache and install Apache
-RUN apt-get update && \
-    apt-get -y install apache2 cron libapache2-mod-php5 mysql-client \
-    php5-curl php5-gd php5-gmp php5-ldap php5-mcrypt php5-mysql php5-snmp \
-    php-pear unzip && \
+# Copy Ansible Related Files
+COPY config/ansible/ /
+
+ENV APACHE2_ENABLE_PHP="true" \
+    PHPIPAM_DB_HOST="db" \
+    PHPIPAM_DB_NAME="phpipam" \
+    PHPIPAM_DB_PASS="phpipam" \
+    PHPIPAM_DB_USER="phpipam"
+
+RUN ansible-playbook -i "localhost," -c local /playbook.yml && \
     apt-get -y clean && \
     apt-get -y autoremove && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm -rf /var/www/html
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install dumb-init
-#ADD https://github.com/Yelp/dumb-init/releases/download/v1.1.2/dumb-init_1.1.2_amd64.deb /tmp
-#RUN dpkg -i /tmp/dumb-init_1.1.2_amd64.deb
-
-# Download and extract phpIPAM
-ADD https://github.com/phpipam/phpipam/archive/master.zip /tmp
-RUN unzip /tmp/master.zip -d /var/www
-RUN mv /var/www/phpipam-master /var/www/html
-
-# Copy default site
-COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
-
-# Copy phpIPAM configuration
-COPY config.php /var/www/html
-
-# Copy cron jobs
-COPY phpipam_discoveryCheck /etc/cron.d
-COPY phpipam_pingCheck /etc/cron.d
-COPY phpipam_resolveIPaddresses /etc/cron.d
-
-RUN a2enmod rewrite
-
-# Apache environment vars
-ENV APACHE_LOCK_DIR /var/lock
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-ENV APACHE_LOG_DIR /var/log/apache2/
-ENV APACHE_PID_FILE /var/apache.pid
-
-# phpIPAM Defaults
-ENV SSL_ENABLED false
-ENV PROXY_ENABLED false
-
-# Expose port(s)
-EXPOSE 80 443
-
-ENTRYPOINT ["apache2ctl"]
-
-CMD ["-D", "FOREGROUND"]
-#CMD ['/usr/bin/dumb-init', '/usr/sbin/apache2ctl', '-D', 'FOREGROUND']
+# Copy Docker Entrypoint
+COPY docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh

@@ -1,0 +1,58 @@
+---
+- hosts: localhost
+  become: true
+  connection: local
+  vars:
+    phpipam_base: '/'
+    phpipam_root: '{{ apache2_web_root }}/phpipam'
+  roles:
+  tasks:
+    - name: setting Debian facts
+      set_fact:
+        apache2_log_dir: "/var/log/apache2"
+        apache2_web_group: "www-data"
+        apache2_web_owner: "www-data"
+        apache2_web_root: "/var/www/html"
+      when: ansible_os_family == "Debian"
+
+    - name: Creating phpIPAM Web Config
+      template:
+        src: "/config.php.j2"
+        dest: "{{ phpipam_root }}/config.php"
+        owner: "{{ apache2_web_owner }}"
+        group: "{{ apache2_web_group }}"
+        backup: yes
+
+    - name: Configuring .htacess
+      template:
+        src: "htaccess.j2"
+        dest: "{{ phpipam_root }}/.htaccess"
+        owner: root
+        group: root
+        backup: yes
+
+    - name: Waiting For SQL Connection On DB Container
+      wait_for:
+        port: 3306
+        host: "{{ phpipam_db_host }}"
+        delay: 10
+      changed_when: false
+
+    - name: Checking If DB Tables Exist
+      command: >
+               mysql
+               -u {{ phpipam_db_user }}
+               --password={{ phpipam_db_pass }}
+               -h {{ phpipam_db_host }}
+               -e "show tables from {{ phpipam_db_name }};"
+      register: "phpipam_tables"
+
+    - name: Importing phpIPAM Schema
+      mysql_db:
+        login_host: "{{ phpipam_db_host }}"
+        login_password: "{{ phpipam_db_pass }}"
+        login_user: "{{ phpipam_db_user }}"
+        name: "{{ phpipam_db_name }}"
+        state: "import"
+        target: "{{ phpipam_root }}/db/SCHEMA.sql"
+      when: ('ipaddresses' not in phpipam_tables.stdout_lines)

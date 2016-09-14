@@ -1,5 +1,5 @@
 <VirtualHost *:80>
-    DocumentRoot /var/www/html
+    DocumentRoot {{ phpipam_root }}
 
     RewriteEngine on
 
@@ -17,5 +17,4 @@
         Order allow,deny
         Allow from all
     </Directory>
-
-    </VirtualHost>
+</VirtualHost>

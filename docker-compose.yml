@@ -1,31 +1,32 @@
 version: '2'
 services:
   db:
-    image: mrlesmithjr/mysql:latest
+    image: "mrlesmithjr/mysql:latest"
     volumes:
       - "db:/var/lib/mysql"
-    restart: always
+    restart: "always"
     environment:
-      MYSQL_ROOT_PASSWORD: phpipam
-      MYSQL_DATABASE: phpipam
-      MYSQL_USER: phpipam
-      MYSQL_PASSWORD: phpipam
+      MYSQL_ROOT_PASSWORD: "phpipam"
+      MYSQL_DATABASE: "phpipam"
+      MYSQL_USER: "phpipam"
+      MYSQL_PASSWORD: "phpipam"
 
   web:
     depends_on:
       - db
-    image: mrlesmithjr/docker-phpipam:latest
+    build: "./"
+    image: "phpipam"
+    # image: "mrlesmithjr/phpipam:latest"
     links:
-      - db
+      - "db"
     ports:
       - "8000:80"
-    restart: always
+    restart: "always"
     environment:
-      MYSQL_DB_HOSTNAME: db
-      MYSQL_DB_USERNAME: phpipam
-      MYSQL_DB_PASSWORD: phpipam
-      MYSQL_DB_NAME: phpipam
-      MYSQL_DB_PORT: 3306
-
+      APACHE2_ENABLE_PHP: "true"
+      PHPIPAM_DB_HOST: "db"
+      PHPIPAM_DB_NAME: "phpipam"
+      PHPIPAM_DB_PASS: "phpipam"
+      PHPIPAM_DB_USER: "phpipam"
 volumes:
   db:
