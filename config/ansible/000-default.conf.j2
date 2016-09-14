@@ -3,15 +3,15 @@
 
     RewriteEngine on
 
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
+    ErrorLog {{ apache2_log_dir }}/error.log
+    CustomLog {{ apache2_log_dir }}/access.log combined
 
     # Docker logs
 
     ErrorLog /proc/self/fd/2
     CustomLog /proc/self/fd/1 combined
 
-    <Directory /var/www/html>
+    <Directory {{ phpipam_root }}>
         Options FollowSymLinks
         AllowOverride All
         Order allow,deny
