@@ -1,4 +1,4 @@
-FROM mrlesmithjr/apache2
+FROM mrlesmithjr/apache2:alpine
 
 MAINTAINER Larry Smith Jr. <mrlesmithjr@gmail.com>
 
@@ -12,9 +12,8 @@ ENV APACHE2_ENABLE_PHP="true" \
     PHPIPAM_DB_USER="phpipam"
 
 RUN ansible-playbook -i "localhost," -c local /playbook.yml && \
-    apt-get -y clean && \
-    apt-get -y autoremove && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    rm -rf /tmp/* && \
+    rm -rf /var/cache/apk/*
 
 # Copy Docker Entrypoint
 COPY docker-entrypoint.sh /
