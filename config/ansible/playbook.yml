@@ -33,6 +33,7 @@
         - 'mysql-client'
         - 'php{{ php_ver }}-pear'
         - 'php{{ php_ver }}-cli'
+        - 'php{{ php_ver }}-ctype'
         - 'php{{ php_ver }}-curl'
         - 'php{{ php_ver }}-gd'
         - 'php{{ php_ver }}-gettext'
