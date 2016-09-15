@@ -1,7 +1,7 @@
 version: '2'
 services:
   db:
-    image: "mrlesmithjr/mysql:latest"
+    image: "mrlesmithjr/mysql:alpine"
     volumes:
       - "db:/var/lib/mysql"
     restart: "always"

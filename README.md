@@ -1,7 +1,8 @@
 docker-phpipam
 --------------
 
-Builds [Docker] image to run [phpIPAM] container.  
+Builds [Docker] image to run [phpIPAM] container provisioned using [Ansible].  
+Based on Alpine Linux.  
 
 Consuming
 ---------
