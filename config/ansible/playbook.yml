@@ -11,7 +11,7 @@
         apache2_log_dir: "/var/log/apache2"
         apache2_web_group: "apache"
         apache2_web_owner: "apache"
-        apache2_web_root: "/var/www/localhost/htdocs/"
+        apache2_web_root: "/var/www/localhost/htdocs"
       when: ansible_os_family == "Alpine"
 
     - name: setting PHP version
@@ -74,38 +74,35 @@
         state: "directory"
         recurse: yes
 
-    # - name: Adding Cron Job For discoveryCheck
-    #   cron:
-    #     name: "phpipam discoveryCheck"
-    #     job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/discoveryCheck.php"
-    #     minute: "*/15"
-    #     hour: "*"
-    #     day: "*"
-    #     month: "*"
-    #     user: "{{ apache2_web_owner }}"
-    #     cron_file: "phpipam_discoveryCheck"
-    #     state: "present"
-    #
-    # - name: Adding Cron Job For pingCheck
-    #   cron:
-    #     name: "phpipam pingCheck"
-    #     job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/pingCheck.php"
-    #     minute: "*/15"
-    #     hour: "*"
-    #     day: "*"
-    #     month: "*"
-    #     user: "{{ apache2_web_owner }}"
-    #     cron_file: "phpipam_pingCheck"
-    #     state: "present"
-    #
-    # - name: Adding Cron Job For resolveIPaddresses
-    #   cron:
-    #     name: "phpipam resolveIPaddresses"
-    #     job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/resolveIPaddresses.php"
-    #     minute: "0"
-    #     hour: "*"
-    #     day: "*"
-    #     month: "*"
-    #     user: "{{ apache2_web_owner }}"
-    #     cron_file: "phpipam_resolveIPaddresses"
-    #     state: "present"
+    - name: Adding Cron Job For discoveryCheck
+      cron:
+        name: "phpipam discoveryCheck"
+        job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/discoveryCheck.php"
+        minute: "*/15"
+        hour: "*"
+        day: "*"
+        month: "*"
+        user: "{{ apache2_web_owner }}"
+        state: "present"
+
+    - name: Adding Cron Job For pingCheck
+      cron:
+        name: "phpipam pingCheck"
+        job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/pingCheck.php"
+        minute: "*/15"
+        hour: "*"
+        day: "*"
+        month: "*"
+        user: "{{ apache2_web_owner }}"
+        state: "present"
+
+    - name: Adding Cron Job For resolveIPaddresses
+      cron:
+        name: "phpipam resolveIPaddresses"
+        job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/resolveIPaddresses.php"
+        minute: "0"
+        hour: "*"
+        day: "*"
+        month: "*"
+        user: "{{ apache2_web_owner }}"
+        state: "present"
