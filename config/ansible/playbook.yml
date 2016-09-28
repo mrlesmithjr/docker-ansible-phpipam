@@ -43,6 +43,7 @@
         - 'php{{ php_ver }}-mcrypt'
         - 'php{{ php_ver }}-mysql'
         - 'php{{ php_ver }}-openssl'
+        - 'php{{ php_ver }}-pcntl'
         - 'php{{ php_ver }}-pdo'
         - 'php{{ php_ver }}-pdo_mysql'
         - 'php{{ php_ver }}-snmp'
