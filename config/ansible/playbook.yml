@@ -83,7 +83,7 @@
         hour: "*"
         day: "*"
         month: "*"
-        user: "{{ apache2_web_owner }}"
+        user: "root" # Needs to be root or this never works currently
         state: "present"
 
     - name: Adding Cron Job For pingCheck
@@ -94,7 +94,7 @@
         hour: "*"
         day: "*"
         month: "*"
-        user: "{{ apache2_web_owner }}"
+        user: "root" # Needs to be root or this never works currently
         state: "present"
 
     - name: Adding Cron Job For resolveIPaddresses
@@ -105,5 +105,5 @@
         hour: "*"
         day: "*"
         month: "*"
-        user: "{{ apache2_web_owner }}"
+        user: "root" # Needs to be root or this never works currently
         state: "present"
