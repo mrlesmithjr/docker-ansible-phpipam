@@ -50,6 +50,7 @@
         - 'php{{ php_ver }}-sockets'
         - 'php{{ php_ver }}-xml'
         - 'py-mysqldb'
+        - 'socat'
 
     - name: Enabling Apache2 mod_rewrite
       replace:
