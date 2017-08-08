@@ -30,6 +30,7 @@
         state: "present"
       with_items:
         - 'git'
+        - 'fping'
         - 'mysql-client'
         - 'php{{ php_ver }}-pear'
         - 'php{{ php_ver }}-cli'
